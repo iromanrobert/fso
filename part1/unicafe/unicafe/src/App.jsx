@@ -8,9 +8,10 @@ const Button = ({ onClick, text }) => {
 
 const StatisticItem = ({ statisticLabel, statisticValue }) => {
   return (
-    <li>
-      {statisticLabel}: {statisticValue}
-    </li>
+    <tr>
+      <td>{statisticLabel}</td>
+      <td>{statisticValue}</td>
+    </tr>
   );
 };
 
@@ -23,14 +24,19 @@ const Statistics = ({
   averageScore,
 }) => {
   return (
-    <ul>
-      <StatisticItem statisticLabel="Good" statisticValue={good} />
-      <StatisticItem statisticLabel="Neutral" statisticValue={neutral} />
-      <StatisticItem statisticLabel="Bad" statisticValue={bad} />
-      <StatisticItem statisticLabel="Total" statisticValue={total} />
-      <StatisticItem statisticLabel="Average" statisticValue={averageScore} />
-      <StatisticItem statisticLabel="Percentage" statisticValue={percentage} />
-    </ul>
+    <table>
+      <tbody>
+        <StatisticItem statisticLabel="Good" statisticValue={good} />
+        <StatisticItem statisticLabel="Neutral" statisticValue={neutral} />
+        <StatisticItem statisticLabel="Bad" statisticValue={bad} />
+        <StatisticItem statisticLabel="Total" statisticValue={total} />
+        <StatisticItem statisticLabel="Average" statisticValue={averageScore} />
+        <StatisticItem
+          statisticLabel="Percentage"
+          statisticValue={`${percentage} %`}
+        />
+      </tbody>
+    </table>
   );
 };
 
@@ -77,14 +83,14 @@ function App() {
   };
 
   return (
-    <section>
-      <header>Feedback Request</header>
-      <div>
+    <section className="feedback">
+      <header className="feedback__header">Feedback Request</header>
+      <div className="button-list">
         <Button onClick={handleGoodFeedback} text="Good 😊" />
         <Button onClick={handleNeutralFeedback} text="Neutral 😐" />
         <Button onClick={handleBadFeedback} text="Bad 🙁" />
       </div>
-      <div>
+      <div className="feedback-statistic">
         <p>Statistics</p>
         {total === 0 ? (
           <p>No feedback given</p>
@@ -95,7 +101,7 @@ function App() {
             bad={bad}
             total={total}
             percentage={percentage}
-            averageScore={averageScore}
+            averageScore={averageScore / total}
           />
         )}
       </div>
