@@ -6,6 +6,14 @@ const Button = ({ onClick, text }) => {
   return <button onClick={onClick}>{text}</button>;
 };
 
+const StatisticItem = ({ statisticLabel, statisticValue }) => {
+  return (
+    <li>
+      {statisticLabel}: {statisticValue}
+    </li>
+  );
+};
+
 const Statistics = ({
   good,
   neutral,
@@ -16,12 +24,12 @@ const Statistics = ({
 }) => {
   return (
     <ul>
-      <li>good: {good}</li>
-      <li>neutral: {neutral}</li>
-      <li>bad: {bad}</li>
-      <li>all: {total}</li>
-      <li>percentage: {percentage}%</li>
-      <li>average: {total === 0 ? 0 : averageScore / total}</li>
+      <StatisticItem statisticLabel="Good" statisticValue={good} />
+      <StatisticItem statisticLabel="Neutral" statisticValue={neutral} />
+      <StatisticItem statisticLabel="Bad" statisticValue={bad} />
+      <StatisticItem statisticLabel="Total" statisticValue={total} />
+      <StatisticItem statisticLabel="Average" statisticValue={averageScore} />
+      <StatisticItem statisticLabel="Percentage" statisticValue={percentage} />
     </ul>
   );
 };
@@ -33,8 +41,6 @@ function App() {
   const [total, setTotal] = useState(0);
   const [percentage, setPercentage] = useState(0);
   const [averageScore, setAverageScore] = useState(0);
-
-  console.log(averageScore);
 
   const calculatePercentage = () => {
     let percentage;
@@ -79,7 +85,7 @@ function App() {
         <Button onClick={handleBadFeedback} text="Bad 🙁" />
       </div>
       <div>
-        <p>Statistics go here</p>
+        <p>Statistics</p>
         {total === 0 ? (
           <p>No feedback given</p>
         ) : (
