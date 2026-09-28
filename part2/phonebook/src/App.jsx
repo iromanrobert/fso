@@ -10,8 +10,14 @@ const App = () => {
       name: newName,
     };
 
-    setPersons(persons.concat(personObject));
-    setNewName("");
+    persons.forEach((person) => {
+      if (person.name === newName) {
+        alert(`${person.name} already exsists in the phonebook`);
+      } else {
+        setPersons(persons.concat(personObject));
+      }
+      setNewName("");
+    });
   };
 
   const handleNewName = (e) => {
