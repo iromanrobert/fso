@@ -19,20 +19,21 @@ const App = () => {
 
   const addNewName = (e) => {
     e.preventDefault();
+    if (persons.some((person) => person.name === newName)) {
+      alert(`${newName} already exists in the phonebook`);
+      return;
+    }
     const personObject = {
       name: newName,
-      phone: newPhoneNumber,
-      id: String(persons.length + 1),
+      number: newPhoneNumber,
     };
 
-    persons.forEach((person) => {
-      if (person.name === newName) {
-        alert(`${person.name} already exsists in the phonebook`);
-      } else {
-        setPersons(persons.concat(personObject));
-      }
-      setNewName("");
-    });
+    axios
+      .post("http://localhost:3001/persons", personObject)
+      .then((response) => {
+        setPersons(persons.concat(response.data));
+        setNewName("");
+      });
   };
 
   const handleNewName = (e) => {
