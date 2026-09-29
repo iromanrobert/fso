@@ -7,12 +7,17 @@ const Form = ({
 }) => {
   return (
     <form onSubmit={onSubmit}>
-      <div>
-        name: <input onChange={handleNewName} value={name} />
-        phone:
-        <input onChange={handleNewPhoneNumber} value={number} />
+      <div className="inputs">
+        <div className="input-group">
+          <label htmlFor="">Name</label>
+          <input onChange={handleNewName} value={name} />
+        </div>
+        <div className="input-group">
+          <label>Phone</label>
+          <input onChange={handleNewPhoneNumber} value={number} />
+        </div>
       </div>
-      <button type="submit">add</button>
+      <button type="submit">Add phone number</button>
     </form>
   );
 };

@@ -1,9 +1,24 @@
 {
   "persons": [
     {
-      "name": "John",
-      "number": "072918312",
-      "id": "IGuG8qK6xyk"
+      "name": "Roman",
+      "number": "07273 721 172",
+      "id": "waspzBcps9A"
+    },
+    {
+      "name": "George",
+      "number": "0728318123",
+      "id": "t3An7zbJRpM"
+    },
+    {
+      "name": "Oana",
+      "number": "07238 81 8123",
+      "id": "gaeuyxq5FGg"
+    },
+    {
+      "name": "Romania",
+      "number": "0827 728 8123",
+      "id": "q_V371sfJFc"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
