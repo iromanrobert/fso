@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 import Filter from "./components/Filter";
 import Form from "./components/Form";
@@ -29,6 +30,7 @@ const App = () => {
     phoneService.create(personObject).then((returnedPerson) => {
       setPersons(persons.concat(returnedPerson));
       setNewName("");
+      setNewPhoneNumber("");
     });
   };
 
@@ -47,6 +49,13 @@ const App = () => {
   const showFilterdElements = persons.filter((person) =>
     person.name.toLowerCase().includes(showFilterd.toLowerCase()),
   );
+
+  const deleteUser = (id, name) => {
+    if (!window.confirm(`Delete ${name} ?`)) return;
+    phoneService.remove(id).then(() => {
+      setPersons(persons.filter((person) => person.id !== id));
+    });
+  };
   return (
     <div>
       <h2>Phonebook</h2>
@@ -59,7 +68,7 @@ const App = () => {
         number={newPhoneNumber}
       />
       <h2>Numbers</h2>
-      <Persons persons={showFilterdElements} />
+      <Persons persons={showFilterdElements} deletePersons={deleteUser} />
     </div>
   );
 };
