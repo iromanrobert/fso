@@ -56,6 +56,52 @@ app.delete("/api/persons/:id", (request, response) => {
   response.status(204).end();
 });
 
+app.use(express.json());
+
+const generateId = () => {
+  const maxId =
+    data.length > 0 ? Math.max(...data.map((n) => Number(n.id))) : 0;
+  return String(maxId + 1);
+};
+
+app.post("/api/persons", (request, response) => {
+  const body = request.body;
+
+  if (!body.name) {
+    return response.status(400).json({
+      error: "name missing",
+    });
+  }
+
+  if (!body.number) {
+    return response.status(400).json({
+      error: "number missing",
+    });
+  }
+
+  const nameExists = data.some(
+    (person) => person.name.toLowerCase() === body.name.toLowerCase(),
+  );
+
+  console.log(nameExists);
+
+  if (nameExists) {
+    return response.status(400).json({
+      error: "name must be unique",
+    });
+  }
+
+  const person = {
+    id: generateId(),
+    name: body.name,
+    number: body.number,
+  };
+
+  data = data.concat(person);
+
+  response.json(data);
+});
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on ${PORT}`);
