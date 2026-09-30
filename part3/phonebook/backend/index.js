@@ -106,7 +106,7 @@ app.post("/api/persons", (request, response) => {
 
   data = data.concat(person);
 
-  response.json(data);
+  response.json(person);
 });
 
 const PORT = process.env.PORT || 3001;
