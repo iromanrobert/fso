@@ -27,6 +27,9 @@ let data = [
 
 app.use(morgan("tiny"));
 
+morgan.token("body", (req) => JSON.stringify(req.body));
+app.use(morgan(":method :url :status : response-time ms - :body"));
+
 app.get("/api/persons", (request, response) => {
   response.json(data);
 });
