@@ -25,7 +25,7 @@ let data = [
   },
 ];
 
-app.use(static("dist"));
+app.use(express.static("dist"));
 app.use(morgan("tiny"));
 
 morgan.token("body", (req) => JSON.stringify(req.body));
