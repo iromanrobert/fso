@@ -1,29 +1,41 @@
+require("dotenv").config();
+
+const dns = require("node:dns");
+dns.setServers(["8.8.8.8", "1.1.1.1"]);
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
+const mongoose = require("mongoose");
 
-let data = [
-  {
-    id: "1",
-    name: "Arto Hellas",
-    number: "040-123456",
+const url = process.env.MONGODB_URI;
+
+console.log(require("dotenv").config());
+
+mongoose.set("strictQuery", true);
+
+mongoose
+  .connect(url, { family: 4 })
+  .then((result) => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((error) => {
+    console.log("Error connecting to MongoDB", error.message);
+  });
+
+const personSchema = new mongoose.Schema({
+  name: String,
+  number: Number,
+});
+
+personSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
   },
-  {
-    id: "2",
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-  },
-  {
-    id: "3",
-    name: "Dan Abramov",
-    number: "12-43-234345",
-  },
-  {
-    id: "4",
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-  },
-];
+});
+
+const Person = mongoose.model("Person", personSchema);
 
 app.use(express.static("dist"));
 app.use(morgan("tiny"));
@@ -32,7 +44,9 @@ morgan.token("body", (req) => JSON.stringify(req.body));
 app.use(morgan(":method :url :status : response-time ms - :body"));
 
 app.get("/api/persons", (request, response) => {
-  response.json(data);
+  Person.find().then((result) => {
+    response.json(result);
+  });
 });
 
 app.get("/info", (request, response) => {
