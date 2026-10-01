@@ -9,8 +9,6 @@ const mongoose = require("mongoose");
 
 const url = process.env.MONGODB_URI;
 
-console.log(require("dotenv").config());
-
 mongoose.set("strictQuery", true);
 
 mongoose
@@ -79,12 +77,6 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.use(express.json());
 
-const generateId = () => {
-  const maxId =
-    data.length > 0 ? Math.max(...data.map((n) => Number(n.id))) : 0;
-  return String(maxId + 1);
-};
-
 app.post("/api/persons", (request, response) => {
   const body = request.body;
 
@@ -100,27 +92,30 @@ app.post("/api/persons", (request, response) => {
     });
   }
 
-  const nameExists = data.some(
-    (person) => person.name.toLowerCase() === body.name.toLowerCase(),
-  );
+  // const nameExists = data.some(
+  //   (person) => person.name.toLowerCase() === body.name.toLowerCase(),
+  // );
 
-  console.log(nameExists);
+  // console.log(nameExists);
 
-  if (nameExists) {
-    return response.status(400).json({
-      error: "name must be unique",
-    });
-  }
+  // if (nameExists) {
+  //   return response.status(400).json({
+  //     error: "name must be unique",
+  //   });
+  // }
 
-  const person = {
-    id: generateId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
+  });
 
-  data = data.concat(person);
+  console.log(person);
 
-  response.json(person);
+  person.save().then((savedPerson) => {
+    console.log(savedPerson);
+    response.json(savedPerson);
+    mongoose.connection.close();
+  });
 });
 
 const PORT = process.env.PORT || 3001;
