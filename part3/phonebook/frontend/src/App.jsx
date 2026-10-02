@@ -25,8 +25,29 @@ const App = () => {
 
   const addNewName = (e) => {
     e.preventDefault();
-    if (persons.some((person) => person.name === newName)) {
-      alert(`${newName} already exists in the phonebook`);
+
+    const existing = persons.find((person) => person.name === newName);
+    if (existing) {
+      console.log(existing);
+      if (
+        window.confirm(
+          `${newName} is already added to the phonbook, replace old number?`,
+        )
+      ) {
+        phoneService
+          .update(existing.id, {
+            ...existing,
+            number: newPhoneNumber,
+          })
+          .then((returnedPerson) => {
+            console.log(persons);
+            setPersons(
+              persons.map((p) => (p.id !== existing.id ? p : returnedPerson)),
+            );
+            setNewName("");
+            setNewPhoneNumber("");
+          });
+      }
       return;
     }
     const personObject = {

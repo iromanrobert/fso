@@ -58,14 +58,13 @@ app.get("/info", (request, response) => {
 });
 
 app.get("/api/persons/:id", (request, response) => {
-  const id = request.params.id;
-  const person = data.find((person) => person.id === id);
-
-  if (person) {
-    response.json(person);
-  } else {
-    response.status(404).end();
-  }
+  Person.findById(request.params.id).then((foundPerson) => {
+    if (foundPerson) {
+      response.json(foundPerson);
+    } else {
+      response.status(404).end();
+    }
+  });
 });
 
 app.delete("/api/persons/:id", (request, response) => {
@@ -77,43 +76,46 @@ app.delete("/api/persons/:id", (request, response) => {
 app.use(express.json());
 
 app.post("/api/persons", (request, response) => {
-  const body = request.body;
+  const { name, number } = request.body;
 
-  if (!body.name) {
+  if (!name) {
     return response.status(400).json({
       error: "name missing",
     });
   }
 
-  if (!body.number) {
+  if (!number) {
     return response.status(400).json({
       error: "number missing",
     });
   }
 
-  // const nameExists = data.some(
-  //   (person) => person.name.toLowerCase() === body.name.toLowerCase(),
-  // );
-
-  // console.log(nameExists);
-
-  // if (nameExists) {
-  //   return response.status(400).json({
-  //     error: "name must be unique",
-  //   });
-  // }
-
   const person = new Person({
-    name: body.name,
-    number: body.number,
+    name: name,
+    number: number,
   });
 
-  console.log(person);
-
   person.save().then((savedPerson) => {
-    console.log(savedPerson);
     response.json(savedPerson);
-    mongoose.connection.close();
+  });
+});
+
+app.put("/api/persons/:id", (request, response) => {
+  const { name, number } = request.body;
+
+  Person.findByIdAndUpdate(
+    request.params.id,
+    {
+      name,
+      number,
+    },
+    { new: true },
+  ).then((updatedPerson) => {
+    if (updatedPerson) {
+      response.json(updatedPerson);
+    } else {
+      response.status(404).end();
+    }
   });
 });
 
