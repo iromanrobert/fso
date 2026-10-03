@@ -99,7 +99,10 @@ const App = () => {
         setPersons(persons.filter((person) => person.id !== id));
       })
       .catch((error) => {
-        showNotification(`${name} already removed from the database`, "error");
+        showNotification(
+          `${name} already removed from the database ${error}`,
+          "error",
+        );
       });
   };
   return (

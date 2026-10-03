@@ -1,24 +1,24 @@
-require("dotenv").config();
+require('dotenv').config()
 
-const dns = require("node:dns");
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-const express = require("express");
-const app = express();
-const morgan = require("morgan");
-const mongoose = require("mongoose");
+const dns = require('node:dns')
+dns.setServers(['8.8.8.8', '1.1.1.1'])
+const express = require('express')
+const app = express()
+const morgan = require('morgan')
+const mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI;
+const url = process.env.MONGODB_URI
 
-mongoose.set("strictQuery", true);
+mongoose.set('strictQuery', true)
 
 mongoose
   .connect(url, { family: 4 })
   .then((result) => {
-    console.log("Connected to MongoDB");
+    console.log('Connected to MongoDB', result)
   })
   .catch((error) => {
-    console.log("Error connecting to MongoDB", error.message);
-  });
+    console.log('Error connecting to MongoDB', error.message)
+  })
 
 const personSchema = new mongoose.Schema({
   name: {
@@ -30,104 +30,96 @@ const personSchema = new mongoose.Schema({
     type: String,
     validate: {
       validator: function (v) {
-        return /^(?=.{8,}$)\d{2,3}-\d+$/.test(v);
+        return /^(?=.{8,}$)\d{2,3}-\d+$/.test(v)
       },
       message: (propse) => `${propse.value} is not a valid phone number!`,
     },
-    required: [true, "User phone number required"],
+    required: [true, 'User phone number required'],
   },
-});
+})
 
-personSchema.set("toJSON", {
+personSchema.set('toJSON', {
   transform: (document, returnedObject) => {
-    returnedObject.id = returnedObject._id.toString();
-    delete returnedObject._id;
-    delete returnedObject.__v;
+    console.log(document)
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
   },
-});
+})
 
-const Person = mongoose.model("Person", personSchema);
+const Person = mongoose.model('Person', personSchema)
 
 const errorHandler = (error, request, response, next) => {
-  console.log(error.message);
+  console.log(error.message)
 
-  if (error.name === "ValidationError") {
-    return response.status(400).json({ error: error.message });
+  if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
 
-  next(error);
-};
+  next(error)
+}
 
-app.use(express.static("dist"));
-app.use(morgan("tiny"));
+app.use(express.static('dist'))
+app.use(morgan('tiny'))
 
-morgan.token("body", (req) => JSON.stringify(req.body));
-app.use(morgan(":method :url :status : response-time ms - :body"));
+morgan.token('body', (req) => JSON.stringify(req.body))
+app.use(morgan(':method :url :status : response-time ms - :body'))
 
-app.get("/api/persons", (request, response) => {
+app.get('/api/persons', (request, response) => {
   Person.find().then((result) => {
-    response.json(result);
-  });
-});
+    response.json(result)
+  })
+})
 
-app.get("/info", (request, response) => {
-  const currentTime = new Date();
-
-  response.send(
-    `<p>Phonebook has info for ${data.length} users</p>
-    <p>${currentTime}</p>
-    `,
-  );
-});
-
-app.get("/api/persons/:id", (request, response) => {
+app.get('/api/persons/:id', (request, response) => {
   Person.findById(request.params.id).then((foundPerson) => {
     if (foundPerson) {
-      response.json(foundPerson);
+      response.json(foundPerson)
     } else {
-      response.status(404).end();
+      response.status(404).end()
     }
-  });
-});
+  })
+})
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete('/api/persons/:id', (request, response) => {
   Person.findByIdAndDelete(request.params.id).then((foundPerson) => {
-    response.status(204).end();
-  });
-});
+    console.log(foundPerson)
+    response.status(204).end()
+  })
+})
 
-app.use(express.json());
+app.use(express.json())
 
-app.post("/api/persons", (request, response, next) => {
-  const { name, number } = request.body;
+app.post('/api/persons', (request, response, next) => {
+  const { name, number } = request.body
 
   if (!name) {
     return response.status(400).json({
-      error: "name missing",
-    });
+      error: 'name missing',
+    })
   }
 
   if (!number) {
     return response.status(400).json({
-      error: "number missing",
-    });
+      error: 'number missing',
+    })
   }
 
   const person = new Person({
     name: name,
     number: number,
-  });
+  })
 
   person
     .save()
     .then((savedPerson) => {
-      response.json(savedPerson);
+      response.json(savedPerson)
     })
-    .catch((error) => next(error));
-});
+    .catch((error) => next(error))
+})
 
-app.put("/api/persons/:id", (request, response) => {
-  const { name, number } = request.body;
+app.put('/api/persons/:id', (request, response) => {
+  const { name, number } = request.body
 
   Person.findByIdAndUpdate(
     request.params.id,
@@ -138,16 +130,16 @@ app.put("/api/persons/:id", (request, response) => {
     { new: true },
   ).then((updatedPerson) => {
     if (updatedPerson) {
-      response.json(updatedPerson);
+      response.json(updatedPerson)
     } else {
-      response.status(404).end();
+      response.status(404).end()
     }
-  });
-});
+  })
+})
 
-app.use(errorHandler);
+app.use(errorHandler)
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
-});
+  console.log(`Server running on ${PORT}`)
+})
