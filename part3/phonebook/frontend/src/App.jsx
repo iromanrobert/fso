@@ -55,19 +55,24 @@ const App = () => {
       number: newPhoneNumber,
     };
 
-    phoneService.create(personObject).then((returnedPerson) => {
-      setPersons(persons.concat(returnedPerson));
-      setNewName("");
-      setNewPhoneNumber("");
-      showNotification(
-        `Added ${returnedPerson.name} to the phonebook`,
-        "success",
-      );
+    phoneService
+      .create(personObject)
+      .then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+        setNewName("");
+        setNewPhoneNumber("");
+        showNotification(
+          `Added ${returnedPerson.name} to the phonebook`,
+          "success",
+        );
 
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 2000);
-    });
+        setTimeout(() => {
+          setNotificationMessage(null);
+        }, 2000);
+      })
+      .catch((error) => {
+        showNotification(`${error.response.data.error}`, "error");
+      });
   };
 
   const handleNewName = (e) => {

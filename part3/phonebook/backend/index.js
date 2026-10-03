@@ -21,7 +21,11 @@ mongoose
   });
 
 const personSchema = new mongoose.Schema({
-  name: String,
+  name: {
+    type: String,
+    minLength: 3,
+    required: true,
+  },
   number: Number,
 });
 
@@ -34,6 +38,16 @@ personSchema.set("toJSON", {
 });
 
 const Person = mongoose.model("Person", personSchema);
+
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
+  }
+
+  next(error);
+};
 
 app.use(express.static("dist"));
 app.use(morgan("tiny"));
@@ -75,7 +89,7 @@ app.delete("/api/persons/:id", (request, response) => {
 
 app.use(express.json());
 
-app.post("/api/persons", (request, response) => {
+app.post("/api/persons", (request, response, next) => {
   const { name, number } = request.body;
 
   if (!name) {
@@ -95,9 +109,12 @@ app.post("/api/persons", (request, response) => {
     number: number,
   });
 
-  person.save().then((savedPerson) => {
-    response.json(savedPerson);
-  });
+  person
+    .save()
+    .then((savedPerson) => {
+      response.json(savedPerson);
+    })
+    .catch((error) => next(error));
 });
 
 app.put("/api/persons/:id", (request, response) => {
@@ -118,6 +135,8 @@ app.put("/api/persons/:id", (request, response) => {
     }
   });
 });
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
