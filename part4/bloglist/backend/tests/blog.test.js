@@ -62,6 +62,23 @@ test("New blog post created succesfully", async () => {
   assert(contents.includes("Learn how to create Super Tests"));
 });
 
+test("Default likes to 0 if likes property is missing", async () => {
+  const newPost = {
+    id: "5a422aa71b54a676234d121f1",
+    title: "Learn how to create Super Tests",
+    author: "Roman Robert",
+    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+  };
+  await api
+    .post("/api/blogs")
+    .send(newPost)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const response = await api.get("/api/blogs");
+  assert.strictEqual(response.body[response.body.length - 1].likes, 0);
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
