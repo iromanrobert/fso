@@ -40,6 +40,28 @@ test("Unique identifier of blog post is id", async () => {
   });
 });
 
+test("New blog post created succesfully", async () => {
+  const newPost = {
+    id: "5a422aa71b54a676234d121f1",
+    title: "Learn how to create Super Tests",
+    author: "Roman Robert",
+    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+    likes: 4,
+  };
+
+  await api
+    .post("/api/blogs")
+    .send(newPost)
+    .expect(201)
+    .expect("Content-Type", /application\/json/);
+
+  const response = await api.get("/api/blogs");
+  const contents = response.body.map((r) => r.title);
+
+  assert.strictEqual(response.body.length, helpers.initialBlogs.length + 1);
+  assert(contents.includes("Learn how to create Super Tests"));
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
