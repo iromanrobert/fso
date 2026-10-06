@@ -99,6 +99,29 @@ describe("Creating a new blog with missing properties", () => {
   });
 });
 
+describe("Deleting a blog post", () => {
+  test("Sucsessfully deleted a blog post", async () => {
+    const blogsAtStart = await helpers.blogsInDb();
+    const blogToDelete = blogsAtStart[0];
+
+    console.log(blogToDelete);
+
+    await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
+
+    const blogsAtEnd = await helpers.blogsInDb();
+
+    console.log(blogsAtEnd);
+
+    const ids = blogsAtEnd.map((b) => b.id);
+
+    console.log(ids);
+    console.log(blogToDelete.id);
+
+    assert(!ids.includes(blogToDelete.id));
+    assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length - 1);
+  });
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
