@@ -122,6 +122,28 @@ describe("Deleting a blog post", () => {
   });
 });
 
+describe("Updating a blog post", () => {
+  test("Updating blog post likes", async () => {
+    const newPost = {
+      likes: 1123,
+    };
+
+    const initialBlogs = await helpers.blogsInDb();
+    const blogToUpdate = initialBlogs[0];
+
+    await api
+      .put(`/api/blogs/${blogToUpdate.id}`)
+      .send(newPost)
+      .expect(200)
+      .expect("Content-Type", /application\/json/);
+
+    const lastBlogs = await helpers.blogsInDb();
+    const updatedBlog = lastBlogs[0];
+
+    assert.strictEqual(updatedBlog.likes, newPost.likes);
+  });
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
