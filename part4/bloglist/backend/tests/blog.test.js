@@ -79,6 +79,26 @@ test("Default likes to 0 if likes property is missing", async () => {
   assert.strictEqual(response.body[response.body.length - 1].likes, 0);
 });
 
+describe("Creating a new blog with missing properties", () => {
+  test("Fails with status 400 if title is missing", async () => {
+    const newPost = {
+      author: "Roman Robert",
+      url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+    };
+
+    await api.post("/api/blogs").send(newPost).expect(400);
+  });
+
+  test("Fails with status 400 if url is missing", async () => {
+    const newPost = {
+      title: "Learn how to create Super Tests",
+      author: "Roman Robert",
+    };
+
+    await api.post("/api/blogs").send(newPost).expect(400);
+  });
+});
+
 after(async () => {
   await mongoose.connection.close();
 });
