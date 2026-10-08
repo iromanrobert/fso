@@ -104,18 +104,14 @@ describe("Deleting a blog post", () => {
     const blogsAtStart = await helpers.blogsInDb();
     const blogToDelete = blogsAtStart[0];
 
-    console.log(blogToDelete);
-
     await api.delete(`/api/blogs/${blogToDelete.id}`).expect(204);
 
     const blogsAtEnd = await helpers.blogsInDb();
+    console.log(blogsAtEnd.length);
 
     console.log(blogsAtEnd);
 
     const ids = blogsAtEnd.map((b) => b.id);
-
-    console.log(ids);
-    console.log(blogToDelete.id);
 
     assert(!ids.includes(blogToDelete.id));
     assert.strictEqual(blogsAtEnd.length, helpers.initialBlogs.length - 1);
@@ -141,6 +137,17 @@ describe("Updating a blog post", () => {
     const updatedBlog = lastBlogs[0];
 
     assert.strictEqual(updatedBlog.likes, newPost.likes);
+  });
+});
+
+describe("Invalid users are not created", () => {
+  test("Invalid user is returning 400 error code", async () => {
+    const invalidUser = {
+      name: "Na",
+      password: "pa",
+    };
+
+    await api.post("/api/blogs").send(invalidUser).expect(400);
   });
 });
 
