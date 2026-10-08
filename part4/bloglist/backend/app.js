@@ -15,6 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(middleware.requestLogger);
 app.use(middleware.errorHandler);
+app.use(middleware.tokenExtractor);
 
 mongoose.connect(config.mongoUrl, { family: 4 });
 
