@@ -3,6 +3,7 @@ import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import LoginForm from "./components/Login";
+import Notification from "./components/Notification";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -10,6 +11,12 @@ const App = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+  const [notificationMessage, setNotificationMessage] = useState("");
+
+  const showNotification = (message, type = "info") => {
+    setNotificationMessage({ message, type });
+    setTimeout(() => setNotificationMessage(null), 3000);
+  };
 
   const blogList = () => (
     <>
@@ -40,6 +47,7 @@ const App = () => {
       blogService.setToken(user.token);
       setUser(user);
     } catch (error) {
+      showNotification("wrong username or password");
       console.log(error.message);
     }
   };
@@ -59,6 +67,10 @@ const App = () => {
     try {
       await blogService.create(blogObject).then((returnedBlog) => {
         setBlogs(blogs.concat(returnedBlog));
+        showNotification(
+          `Added ${returnedBlog.title} by ${returnedBlog.author}, added`,
+          "success",
+        );
       });
     } catch (error) {
       console.log(error.message);
@@ -104,6 +116,10 @@ const App = () => {
           {blogList()}
         </div>
       )}
+      <Notification
+        message={notificationMessage?.message ?? null}
+        type={notificationMessage?.type}
+      />
     </div>
   );
 };
