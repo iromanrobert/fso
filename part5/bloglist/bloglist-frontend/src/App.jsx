@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
@@ -13,6 +13,8 @@ const App = () => {
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
   const [notificationMessage, setNotificationMessage] = useState("");
+
+  const blogRef = useRef();
 
   const showNotification = (message, type = "info") => {
     setNotificationMessage({ message, type });
@@ -60,6 +62,7 @@ const App = () => {
 
   const handleBlogCreation = async (e) => {
     e.preventDefault();
+    blogRef.current.handleVisibility();
     const blogObject = {
       title: title,
       author: author,
@@ -86,7 +89,7 @@ const App = () => {
           <p>hello {user.username}</p>
           <button onClick={handleLogout}>log out</button>
 
-          <Togglable buttonLabel="create new blog">
+          <Togglable buttonLabel="create new blog" ref={blogRef}>
             <form onSubmit={handleBlogCreation}>
               <h2>Create new blog post</h2>
               <div className="form-group">
