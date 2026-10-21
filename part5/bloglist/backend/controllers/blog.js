@@ -9,6 +9,14 @@ blogRouter.get("/", async (request, response) => {
   response.json(blogs);
 });
 
+blogRouter.get("/:id", async (request, response) => {
+  const blog = await Blog.findById(request.params.id).populate("user", {
+    username: 1,
+    name: 1,
+  });
+  response.json(blog);
+});
+
 blogRouter.post("/", async (request, response) => {
   const body = request.body;
   const decodedToken = jwt.verify(request.token, process.env.SECRET);
@@ -54,16 +62,31 @@ blogRouter.delete("/:id", async (request, response) => {
 
 blogRouter.put("/:id", async (request, response) => {
   const likes = request.body.likes;
+  const blog = await Blog.findById(request.params.id);
 
-  const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, {
-    likes,
-  });
-
-  if (updatedBlog) {
-    response.json(updatedBlog);
-  } else {
-    response.status(404).end();
+  const decodedToken = jwt.verify(request.token, process.env.SECRET);
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: "token invalid" });
   }
+  const user = await User.findById(decodedToken.id);
+
+  if (!blog) {
+    return response.status(404).end();
+  }
+
+  if (!user) {
+    return response
+      .status(400)
+      .json({ error: "userId is missing or not valid" });
+  }
+
+  if (blog.user.toString() !== user.id) {
+    return response.status(403).json({ error: "Not the owner of the blog" });
+  }
+
+  blog.likes = likes;
+  const updatedBlog = await blog.save();
+  response.json(updatedBlog);
 });
 
 module.exports = blogRouter;
