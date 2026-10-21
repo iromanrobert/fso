@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import blogService from "../services/blogs";
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleDelete }) => {
   const [visible, setVisible] = useState(false);
   const [likes, setLikes] = useState(blog.likes);
 
@@ -30,13 +30,16 @@ const Blog = ({ blog }) => {
     <div>
       {blog.title} {blog.author}{" "}
       <button onClick={handleVisibility}>{buttonText}</button>
-      <ul style={displayDetails}>
-        <li>{blog.url}</li>
-        <li>
-          {likes} <button onClick={() => handleLike(blog.id)}>like</button>
-        </li>
-        <li>{blog.user.username}</li>
-      </ul>
+      <div style={displayDetails}>
+        <ul>
+          <li>{blog.url}</li>
+          <li>
+            {likes} <button onClick={() => handleLike(blog.id)}>like</button>
+          </li>
+          <li>{blog.user.username}</li>
+        </ul>
+        <button onClick={() => handleDelete(blog.id)}>delete</button>
+      </div>
     </div>
   );
 };

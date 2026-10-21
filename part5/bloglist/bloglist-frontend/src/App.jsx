@@ -14,7 +14,7 @@ const App = () => {
 
   const blogRef = useRef();
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes);
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes);
 
   const showNotification = (message, type = "info") => {
     setNotificationMessage({ message, type });
@@ -25,7 +25,11 @@ const App = () => {
     <>
       <h2>blogs</h2>
       {sortedBlogs.map((blog) => (
-        <Blog key={blog.id} blog={blog} />
+        <Blog
+          key={blog.id}
+          blog={blog}
+          handleDelete={() => deleteBlogPost(blog.id)}
+        />
       ))}
     </>
   );
@@ -73,6 +77,17 @@ const App = () => {
       });
     } catch (error) {
       console.log(error.message);
+    }
+  };
+
+  const deleteBlogPost = async (id) => {
+    if (window.confirm(`Do you want to delete`)) {
+      try {
+        await blogService.remove(id);
+        setBlogs(blogs.filter((b) => b.id !== id));
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
 
