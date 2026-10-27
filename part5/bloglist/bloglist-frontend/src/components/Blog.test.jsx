@@ -1,6 +1,7 @@
 import { screen, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Blog from "./Blog";
+import BlogForm from "./BlogForm";
 import { describe, expect } from "vitest";
 
 describe("<Blog />", () => {
@@ -46,5 +47,27 @@ describe("<Blog />", () => {
 
     expect(screen.getByText("https://jksadbnakljdasda")).toBeVisible();
     expect(screen.getByText("robert")).toBeVisible();
+  });
+
+  test("Creating a new blog form calls the evend handler with the right details when a new blog", async () => {
+    const createBlog = vi.fn();
+    const user = userEvent.setup();
+
+    render(<BlogForm createBlog={createBlog} />);
+
+    const titleInput = screen.getByLabelText("title");
+    const authorInput = screen.getByLabelText("author");
+    const urlInput = screen.getByLabelText("url");
+    const createButton = screen.getByText("create");
+
+    await user.type(titleInput, "Vitests are hard");
+    await user.type(authorInput, "Roman Robert");
+    await user.type(urlInput, "https://romanrobert.com");
+    await user.click(createButton);
+
+    expect(createBlog.mock.calls).toHaveLength(1);
+    expect(createBlog.mock.calls[0][0].title).toBe("Vitests are hard");
+    expect(createBlog.mock.calls[0][0].author).toBe("Roman Robert");
+    expect(createBlog.mock.calls[0][0].url).toBe("https://romanrobert.com");
   });
 });
