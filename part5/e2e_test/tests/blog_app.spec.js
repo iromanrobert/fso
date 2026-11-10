@@ -73,5 +73,21 @@ describe("Blog App", () => {
 
       await expect(likes).toHaveText(String(beforeLike + 1));
     });
+
+    test("Blog post can be deleted by user", async ({ page }) => {
+      const container = page
+        .locator(".blog-container")
+        .filter({ hasText: "Testing is wonderfull" });
+
+      await container.getByRole("button", { name: "show" }).click();
+      page.on("dialog", (dialog) => dialog.accept());
+      await container.getByRole("button", { name: "delete" }).click();
+
+      const header = await page
+        .locator("h2")
+        .filter({ hasText: "Testing is wonderfull" });
+
+      await expect(header).not.toBeVisible();
+    });
   });
 });
