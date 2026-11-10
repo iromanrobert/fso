@@ -38,4 +38,24 @@ describe("Blog App", () => {
       await expect(page.getByText("wrong username or password")).toBeVisible();
     });
   });
+
+  describe("When logged in", () => {
+    beforeEach(async ({ page }) => {
+      await page.getByLabel("username").fill("robert");
+      await page.getByLabel("password").fill("password");
+      await page.getByRole("button", { name: "login" }).click();
+    });
+
+    test("A new blog can be created", async ({ page }) => {
+      await page.getByRole("button", { name: "create new blog" }).click();
+      await page.getByLabel("title").fill("Testing is wonderfull");
+      await page.getByLabel("author").fill("Roman Robert");
+      await page.getByLabel("url").fill("https://www.romanrobert.com");
+      await page.getByRole("button", { name: "create" }).click();
+
+      await expect(
+        page.getByText("Added Testing is wonderfull by Roman Robert, added"),
+      ).toBeVisible();
+    });
+  });
 });
