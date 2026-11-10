@@ -27,14 +27,15 @@ const Blog = ({ blog, handleDelete }) => {
   };
 
   return (
-    <div>
+    <div className="blog-container">
       <h2>{blog.title}</h2> <p>{blog.author} </p>
       <button onClick={handleVisibility}>{buttonText}</button>
       <div style={displayDetails}>
         <ul>
           <li>{blog.url}</li>
           <li>
-            {likes} <button onClick={() => handleLike(blog.id)}>like</button>
+            <span className="likes-count">{likes}</span>
+            <button onClick={() => handleLike(blog.id)}>like</button>
           </li>
           <li>{blog.user.username}</li>
         </ul>

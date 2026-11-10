@@ -44,18 +44,34 @@ describe("Blog App", () => {
       await page.getByLabel("username").fill("robert");
       await page.getByLabel("password").fill("password");
       await page.getByRole("button", { name: "login" }).click();
-    });
 
-    test("A new blog can be created", async ({ page }) => {
       await page.getByRole("button", { name: "create new blog" }).click();
       await page.getByLabel("title").fill("Testing is wonderfull");
       await page.getByLabel("author").fill("Roman Robert");
       await page.getByLabel("url").fill("https://www.romanrobert.com");
       await page.getByRole("button", { name: "create" }).click();
+    });
 
+    test("A new blog can be created", async ({ page }) => {
       await expect(
         page.getByText("Added Testing is wonderfull by Roman Robert, added"),
       ).toBeVisible();
+    });
+
+    test("Blog post can be liked", async ({ page }) => {
+      const container = page
+        .locator(".blog-container")
+        .filter({ hasText: "Testing is wonderfull" });
+
+      const likes = container.locator(".likes-count");
+
+      await container.getByRole("button", { name: "show" }).click();
+
+      const beforeLike = Number(await likes.innerText());
+
+      await container.getByRole("button", { name: "like" }).click();
+
+      await expect(likes).toHaveText(String(beforeLike + 1));
     });
   });
 });
