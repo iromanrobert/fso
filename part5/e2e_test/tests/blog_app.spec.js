@@ -50,6 +50,7 @@ describe("Blog App", () => {
       await page.getByLabel("author").fill("Roman Robert");
       await page.getByLabel("url").fill("https://www.romanrobert.com");
       await page.getByRole("button", { name: "create" }).click();
+      await expect(page.locator(".blog-container")).toHaveCount(1);
     });
 
     test("A new blog can be created", async ({ page }) => {
@@ -121,6 +122,42 @@ describe("Blog App", () => {
       await expect(
         container.getByRole("button", { name: "delete" }),
       ).toHaveCount(0);
+    });
+
+    test("Blogs are ordered by likes, most liked first", async ({ page }) => {
+      const blogs = page.locator(".blog-container");
+
+      const likeBlog = async (title, times) => {
+        const container = blogs.filter({ hasText: title });
+
+        for (let i = 1; i <= times; i++) {
+          const showButton = container.getByRole("button", { name: "show" });
+          if (await showButton.isVisible()) {
+            await showButton.click();
+          }
+
+          await container
+            .getByRole("button", { name: "like", exact: true })
+            .click();
+          await expect(container.locator(".likes-count")).toHaveText(String(i));
+        }
+      };
+
+      await page.getByRole("button", { name: "create new blog" }).click();
+      await page.getByLabel("title").fill("Testing React Applications");
+      await page.getByLabel("author").fill("Roman Robert");
+      await page.getByLabel("url").fill("https://www.romanrobert.com");
+      await page.getByRole("button", { name: "create", exact: true }).click();
+
+      await expect(blogs).toHaveCount(2);
+
+      await likeBlog("Testing React Applications", 2);
+      await likeBlog("Testing is wonderfull", 1);
+
+      await expect(blogs).toHaveText([
+        /Testing React Applications/,
+        /Testing is wonderfull/,
+      ]);
     });
   });
 });
