@@ -29,6 +29,7 @@ const App = () => {
           key={blog.id}
           blog={blog}
           handleDelete={() => deleteBlogPost(blog.id)}
+          user={user}
         />
       ))}
     </>

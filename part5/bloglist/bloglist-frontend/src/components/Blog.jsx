@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import blogService from "../services/blogs";
 
-const Blog = ({ blog, handleDelete }) => {
+const Blog = ({ blog, handleDelete, user }) => {
   const [visible, setVisible] = useState(false);
   const [likes, setLikes] = useState(blog.likes);
 
@@ -10,6 +10,8 @@ const Blog = ({ blog, handleDelete }) => {
 
   const handleVisibility = () => setVisible(!visible);
   const buttonText = visible ? "hide" : "show";
+
+  const showDelete = user && blog.user && blog.user.username === user.username;
 
   const handleLike = async (id) => {
     const previousLikes = likes;
@@ -39,7 +41,9 @@ const Blog = ({ blog, handleDelete }) => {
           </li>
           <li>{blog.user.username}</li>
         </ul>
-        <button onClick={() => handleDelete(blog.id)}>delete</button>
+        {showDelete && (
+          <button onClick={() => handleDelete(blog.id)}>delete</button>
+        )}
       </div>
     </div>
   );
