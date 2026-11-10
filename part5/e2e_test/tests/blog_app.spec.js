@@ -89,5 +89,38 @@ describe("Blog App", () => {
 
       await expect(header).not.toBeVisible();
     });
+
+    test("Only the creator sees the delete button", async ({
+      page,
+      request,
+    }) => {
+      await request.post("http://localhost:3003/api/users", {
+        data: {
+          name: "Other User",
+          username: "other",
+          password: "password",
+        },
+      });
+
+      const container = page
+        .locator(".blog-container")
+        .filter({ hasText: "Testing is wonderfull" });
+
+      await container.getByRole("button", { name: "show" }).click();
+      await expect(
+        container.getByRole("button", { name: "delete" }),
+      ).toBeVisible();
+
+      await page.getByRole("button", { name: "log out" }).click();
+
+      await page.getByLabel("username").fill("other");
+      await page.getByLabel("password").fill("password");
+      await page.getByRole("button", { name: "login" }).click();
+
+      await container.getByRole("button", { name: "show" }).click();
+      await expect(
+        container.getByRole("button", { name: "delete" }),
+      ).toHaveCount(0);
+    });
   });
 });
