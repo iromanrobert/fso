@@ -1,73 +1,105 @@
 import { screen, render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { describe, expect, test, vi } from "vitest";
 import Blog from "./Blog";
-import BlogForm from "./BlogForm";
-import { describe, expect } from "vitest";
 
-describe("<Blog />", () => {
-  test(" component renders title and author, does not render url or number of likes by defaul", () => {
-    const content = {
-      title: "How to vitest",
-      author: "Roman Robert",
-      likes: 8,
-      url: "https://jksadbnakljdasda",
-      user: {
-        username: "robert",
-      },
-    };
+const blog = {
+  id: "123",
+  title: "How to vitest",
+  author: "Roman Robert",
+  likes: 8,
+  url: "https://jksadbnakljdasda",
+  user: {
+    username: "robert",
+    name: "Roman Robert",
+  },
+};
 
-    render(<Blog blog={content} />);
+const creator = { username: "robert", name: "Roman Robert" };
+const otherUser = { username: "someoneelse", name: "Someone Else" };
 
-    const title = screen.getByText("How to vitest");
-    const author = screen.getByText("Roman Robert");
+const renderBlog = (user, handlers = {}) =>
+  render(
+    <MemoryRouter initialEntries={["/blogs/123"]}>
+      <Routes>
+        <Route
+          path="/blogs/:id"
+          element={
+            <Blog
+              blogs={[blog]}
+              user={user}
+              handleLike={handlers.handleLike ?? vi.fn()}
+              handleDelete={handlers.handleDelete ?? vi.fn()}
+            />
+          }
+        />
+      </Routes>
+    </MemoryRouter>,
+  );
 
-    expect(title).toBeInTheDocument();
-    expect(author).toBeInTheDocument();
-    expect(screen.getByText("8")).not.toBeVisible();
-    expect(screen.getByText("https://jksadbnakljdasda")).not.toBeVisible();
-    expect(screen.getByText("robert")).not.toBeVisible();
+describe("<Blog /> single blog view", () => {
+  describe("when the user is not logged in", () => {
+    test("shows blog info and likes", () => {
+      renderBlog(null);
+
+      expect(
+        screen.getByText(/How to vitest by Roman Robert/),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole("link", { name: "https://jksadbnakljdasda" }),
+      ).toBeInTheDocument();
+      expect(screen.getByText("8")).toBeInTheDocument();
+      expect(screen.getByText(/added by robert/)).toBeInTheDocument();
+    });
+
+    test("shows no buttons", () => {
+      renderBlog(null);
+
+      expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    });
   });
 
-  test("Component renders URL and number of likes when show details button is clicked", async () => {
-    const content = {
-      title: "How to vitest",
-      author: "Roman Robert",
-      likes: 8,
-      url: "https://jksadbnakljdasda",
-      user: {
-        username: "robert",
-      },
-    };
+  describe("when logged in as a user who did not create the blog", () => {
+    test("shows only the like button", () => {
+      renderBlog(otherUser);
 
-    render(<Blog blog={content} />);
+      expect(screen.getByRole("button", { name: "like" })).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "delete" }),
+      ).not.toBeInTheDocument();
+    });
 
-    const user = userEvent.setup();
-    const button = screen.getByText("show");
-    await user.click(button);
+    test("clicking like calls handleLike with the blog", async () => {
+      const handleLike = vi.fn();
+      const user = userEvent.setup();
+      renderBlog(otherUser, { handleLike });
 
-    expect(screen.getByText("https://jksadbnakljdasda")).toBeVisible();
-    expect(screen.getByText("robert")).toBeVisible();
+      await user.click(screen.getByRole("button", { name: "like" }));
+
+      expect(handleLike).toHaveBeenCalledTimes(1);
+      expect(handleLike).toHaveBeenCalledWith(blog);
+    });
   });
 
-  test("Creating a new blog form calls the evend handler with the right details when a new blog", async () => {
-    const createBlog = vi.fn();
-    const user = userEvent.setup();
+  describe("when logged in as the blog's creator", () => {
+    test("shows both the like and delete buttons", () => {
+      renderBlog(creator);
 
-    render(<BlogForm createBlog={createBlog} />);
+      expect(screen.getByRole("button", { name: "like" })).toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "delete" }),
+      ).toBeInTheDocument();
+    });
 
-    const titleInput = screen.getByLabelText("title");
-    const authorInput = screen.getByLabelText("author");
-    const urlInput = screen.getByLabelText("url");
-    const createButton = screen.getByText("create");
+    test("clicking delete calls handleDelete with the blog id", async () => {
+      const handleDelete = vi.fn();
+      const user = userEvent.setup();
+      renderBlog(creator, { handleDelete });
 
-    await user.type(titleInput, "Vitests are hard");
-    await user.type(authorInput, "Roman Robert");
-    await user.type(urlInput, "https://romanrobert.com");
-    await user.click(createButton);
+      await user.click(screen.getByRole("button", { name: "delete" }));
 
-    expect(createBlog.mock.calls).toHaveLength(1);
-    expect(createBlog.mock.calls[0][0].title).toBe("Vitests are hard");
-    expect(createBlog.mock.calls[0][0].author).toBe("Roman Robert");
-    expect(createBlog.mock.calls[0][0].url).toBe("https://romanrobert.com");
+      expect(handleDelete).toHaveBeenCalledWith("123");
+    });
   });
 });

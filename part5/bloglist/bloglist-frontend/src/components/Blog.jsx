@@ -6,7 +6,8 @@ const Blog = ({ blogs, user, handleLike, handleDelete }) => {
 
   if (!blog) return null;
 
-  const isLoggedIn = user && blog.user?.username === user.username;
+  const isLoggedIn = Boolean(user);
+  const isCreator = isLoggedIn && blog.user?.username === user.username;
 
   return (
     <div className="blog-container">
@@ -23,7 +24,7 @@ const Blog = ({ blogs, user, handleLike, handleDelete }) => {
 
       <p>added by {blog.user?.username}</p>
 
-      {isLoggedIn && (
+      {isCreator && (
         <button onClick={() => handleDelete(blog.id)}>delete</button>
       )}
     </div>
