@@ -58,14 +58,13 @@ const App = () => {
   };
 
   const handleBlogCreation = async (blogObject) => {
-    blogRef.current.handleVisibility();
-
     try {
       await blogService.create(blogObject).then((returnedBlog) => {
         setBlogs(blogs.concat(returnedBlog));
         showNotification(
           `Added ${returnedBlog.title} by ${returnedBlog.author}, added`,
           "success",
+          navigate("/"),
         );
       });
     } catch (error) {
@@ -94,6 +93,7 @@ const App = () => {
       try {
         await blogService.remove(id);
         setBlogs(blogs.filter((b) => b.id !== id));
+        navigate("/");
       } catch (error) {
         console.log(error);
       }
@@ -104,6 +104,7 @@ const App = () => {
     <>
       <nav>
         <Link to="/">Blogs</Link>
+        {user && <Link to="/new-blog">New blog</Link>}
         {user ? (
           <button onClick={handleLogout}>log out</button>
         ) : (
@@ -131,26 +132,12 @@ const App = () => {
         />
 
         <Route path="/login" element={<LoginForm onLogin={handleLogin} />} />
+        <Route
+          path="/new-blog"
+          element={<BlogForm createBlog={handleBlogCreation} />}
+        />
       </Routes>
     </>
-    // <div>
-    //   {!user && }
-    //   {user && (
-    //     <div>
-    //       <p>hello {user.username}</p>
-    //
-
-  //       <Togglable buttonLabel="create new blog" ref={blogRef}>
-  //         <BlogForm createBlog={handleBlogCreation} />
-  //       </Togglable>
-
-  //     </div>
-  //   )}
-  //   <Notification
-  //     message={notificationMessage?.message ?? null}
-  //     type={notificationMessage?.type}
-  //   />
-  // </div>
   );
 };
 
