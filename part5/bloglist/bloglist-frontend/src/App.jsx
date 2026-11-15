@@ -111,6 +111,10 @@ const App = () => {
           <Link to="/login">Login</Link>
         )}
       </nav>
+      <Notification
+        message={notificationMessage?.message}
+        type={notificationMessage?.type}
+      />
 
       <Routes>
         <Route
