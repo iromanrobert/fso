@@ -9,6 +9,7 @@ import BlogForm from "./components/BlogForm";
 import BlogList from "./components/BlogList";
 import Togglable from "./components/Togglable";
 import Notification from "./components/Notification";
+import Blog from "./components/Blog";
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
@@ -72,6 +73,22 @@ const App = () => {
     }
   };
 
+  const handleLike = async (blog) => {
+    try {
+      const returnedBlog = await blogService.update(blog.id, {
+        ...blog,
+        likes: blog.likes + 1,
+      });
+      setBlogs(
+        blogs.map((b) =>
+          b.id === blog.id ? { ...b, likes: returnedBlog.likes } : b,
+        ),
+      );
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const deleteBlogPost = async (id) => {
     if (window.confirm("Do you want to delete")) {
       try {
@@ -96,6 +113,17 @@ const App = () => {
 
       <Routes>
         <Route
+          path="/blogs/:id"
+          element={
+            <Blog
+              blogs={blogs}
+              user={user}
+              handleDelete={deleteBlogPost}
+              handleLike={handleLike}
+            />
+          }
+        />
+        <Route
           path="/"
           element={
             <BlogList user={user} blogs={blogs} handleDelete={deleteBlogPost} />
@@ -112,17 +140,17 @@ const App = () => {
     //       <p>hello {user.username}</p>
     //
 
-    //       <Togglable buttonLabel="create new blog" ref={blogRef}>
-    //         <BlogForm createBlog={handleBlogCreation} />
-    //       </Togglable>
+  //       <Togglable buttonLabel="create new blog" ref={blogRef}>
+  //         <BlogForm createBlog={handleBlogCreation} />
+  //       </Togglable>
 
-    //     </div>
-    //   )}
-    //   <Notification
-    //     message={notificationMessage?.message ?? null}
-    //     type={notificationMessage?.type}
-    //   />
-    // </div>
+  //     </div>
+  //   )}
+  //   <Notification
+  //     message={notificationMessage?.message ?? null}
+  //     type={notificationMessage?.type}
+  //   />
+  // </div>
   );
 };
 

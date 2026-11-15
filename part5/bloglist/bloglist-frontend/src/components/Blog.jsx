@@ -1,50 +1,31 @@
-import { useState } from "react";
+import { useParams } from "react-router-dom";
 
-import blogService from "../services/blogs";
+const Blog = ({ blogs, user, handleLike, handleDelete }) => {
+  const { id } = useParams();
+  const blog = blogs.find((b) => b.id === id);
 
-const Blog = ({ blog, handleDelete, user }) => {
-  const [visible, setVisible] = useState(false);
-  const [likes, setLikes] = useState(blog.likes);
+  if (!blog) return null;
 
-  const displayDetails = { display: visible ? "" : "none" };
-
-  const handleVisibility = () => setVisible(!visible);
-  const buttonText = visible ? "hide" : "show";
-
-  const showDelete = user && blog.user && blog.user.username === user.username;
-
-  const handleLike = async (id) => {
-    const previousLikes = likes;
-    setLikes(previousLikes + 1);
-
-    const changedBlog = { ...blog, likes: previousLikes + 1 };
-
-    try {
-      const returnedBlog = await blogService.update(id, changedBlog);
-      setLikes(returnedBlog.likes);
-    } catch (error) {
-      setLikes(previousLikes);
-      console.log(error);
-    }
-  };
+  const isLoggedIn = user && blog.user?.username === user.username;
 
   return (
     <div className="blog-container">
-      <h2>{blog.title}</h2> <p>{blog.author} </p>
-      <button onClick={handleVisibility}>{buttonText}</button>
-      <div style={displayDetails}>
-        <ul>
-          <li>{blog.url}</li>
-          <li>
-            <span className="likes-count">{likes}</span>
-            <button onClick={() => handleLike(blog.id)}>like</button>
-          </li>
-          <li>{blog.user.username}</li>
-        </ul>
-        {showDelete && (
-          <button onClick={() => handleDelete(blog.id)}>delete</button>
-        )}
+      <h2>
+        {blog.title} by {blog.author}
+      </h2>
+
+      <a href={blog.url}>{blog.url}</a>
+
+      <div>
+        <span className="likes-count">{blog.likes}</span> likes
+        {isLoggedIn && <button onClick={() => handleLike(blog)}>like</button>}
       </div>
+
+      <p>added by {blog.user?.username}</p>
+
+      {isLoggedIn && (
+        <button onClick={() => handleDelete(blog.id)}>delete</button>
+      )}
     </div>
   );
 };
