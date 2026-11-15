@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react";
 
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 
+import { Container } from "@mui/material";
+
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 import LoginForm from "./components/Login";
@@ -101,7 +103,7 @@ const App = () => {
   };
 
   return (
-    <>
+    <Container>
       <nav>
         <Link to="/">Blogs</Link>
         {user && <Link to="/new-blog">New blog</Link>}
@@ -141,7 +143,7 @@ const App = () => {
           element={<BlogForm createBlog={handleBlogCreation} />}
         />
       </Routes>
-    </>
+    </Container>
   );
 };
 
