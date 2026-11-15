@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { AppBar, Toolbar, Button, Box } from "@mui/material";
 
 import { Routes, Route, Link, useNavigate } from "react-router-dom";
 
@@ -104,15 +105,30 @@ const App = () => {
 
   return (
     <Container>
-      <nav>
-        <Link to="/">Blogs</Link>
-        {user && <Link to="/new-blog">New blog</Link>}
-        {user ? (
-          <button onClick={handleLogout}>log out</button>
-        ) : (
-          <Link to="/login">Login</Link>
-        )}
-      </nav>
+      <AppBar position="static">
+        <Toolbar>
+          <Button color="inherit" component={Link} to="/">
+            Blogs
+          </Button>
+          {user && (
+            <Button color="inherit" component={Link} to="/new-blog">
+              New blog
+            </Button>
+          )}
+
+          <Box sx={{ flexGrow: 1 }} />
+
+          {user ? (
+            <Button color="inherit" onClick={handleLogout}>
+              log out
+            </Button>
+          ) : (
+            <Button color="inherit" component={Link} to="/login">
+              Login
+            </Button>
+          )}
+        </Toolbar>
+      </AppBar>
       <Notification
         message={notificationMessage?.message}
         type={notificationMessage?.type}
