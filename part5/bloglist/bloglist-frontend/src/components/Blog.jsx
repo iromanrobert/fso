@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { Paper, Typography, Stack, Button, Link } from "@mui/material";
 
 const Blog = ({ blogs, user, handleLike, handleDelete }) => {
   const { id } = useParams();
@@ -10,24 +11,47 @@ const Blog = ({ blogs, user, handleLike, handleDelete }) => {
   const isCreator = isLoggedIn && blog.user?.username === user.username;
 
   return (
-    <div className="blog-container">
-      <h2>
-        {blog.title} by {blog.author}
-      </h2>
+    <Paper className="blog-container" sx={{ p: 3, mt: 2 }}>
+      <Stack spacing={2}>
+        <Typography variant="h5" component="h2">
+          {blog.title} by {blog.author}
+        </Typography>
 
-      <a href={blog.url}>{blog.url}</a>
+        <Link href={blog.url} target="_blank" rel="noopener noreferrer">
+          {blog.url}
+        </Link>
 
-      <div>
-        <span className="likes-count">{blog.likes}</span> likes
-        {isLoggedIn && <button onClick={() => handleLike(blog)}>like</button>}
-      </div>
+        <Stack direction="row" spacing={2} alignItems="center">
+          <Typography>
+            <span className="likes-count">{blog.likes}</span> likes
+          </Typography>
+          {isLoggedIn && (
+            <Button
+              variant="outlined"
+              size="small"
+              onClick={() => handleLike(blog)}
+            >
+              like
+            </Button>
+          )}
+        </Stack>
 
-      <p>added by {blog.user?.username}</p>
+        <Typography variant="body2" color="text.secondary">
+          added by {blog.user?.username}
+        </Typography>
 
-      {isCreator && (
-        <button onClick={() => handleDelete(blog.id)}>delete</button>
-      )}
-    </div>
+        {isCreator && (
+          <Button
+            variant="contained"
+            color="error"
+            sx={{ alignSelf: "flex-start" }}
+            onClick={() => handleDelete(blog.id)}
+          >
+            delete
+          </Button>
+        )}
+      </Stack>
+    </Paper>
   );
 };
 
