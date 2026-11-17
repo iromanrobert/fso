@@ -42,6 +42,6 @@ export const useFeedbackStats = () => {
     bad,
     total,
     average: total ? average.toFixed(2) : 0,
-    positivePercentage: total ? positivePercentage.toFixed(2) : 0,
+    positivePercentage: total ? positivePercentage.toFixed() : 0,
   };
 };
