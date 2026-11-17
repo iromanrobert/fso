@@ -36,5 +36,12 @@ export const useFeedbackStats = () => {
   const average = total ? (good - bad) / total : 0;
   const positivePercentage = total ? (good / total) * 100 : 0;
 
-  return { good, neutral, bad, total, average, positivePercentage };
+  return {
+    good,
+    neutral,
+    bad,
+    total,
+    average: total ? average.toFixed(2) : 0,
+    positivePercentage: total ? positivePercentage.toFixed(2) : 0,
+  };
 };

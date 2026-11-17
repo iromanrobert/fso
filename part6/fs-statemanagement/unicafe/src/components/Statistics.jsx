@@ -27,11 +27,11 @@ const Statistics = () => {
           </tr>
           <tr>
             <td>average</td>
-            <td>{average.toFixed(2)}</td>
+            <td>{average}</td>
           </tr>
           <tr>
             <td>positive</td>
-            <td>{positivePercentage.toFixed()} %</td>
+            <td>{positivePercentage} %</td>
           </tr>
         </tbody>
       </table>
